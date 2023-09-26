@@ -649,11 +649,11 @@ class FieldSet {
     }
 
     hash = _HashUtils._combine(hash, fi.tagNumber);
-    if (_isBytes(fi.type)) {
+    if (PbFieldTypeInternal.isBytes(fi.type)) {
       // Bytes are represented as a List<int> (Usually with byte-data).
       // We special case that to match our equality semantics.
       hash = _HashUtils._combine(hash, _HashUtils._hashObjects(value));
-    } else if (!_isEnum(fi.type)) {
+    } else if (!PbFieldTypeInternal.isEnum(fi.type)) {
       hash = _HashUtils._combine(hash, value.hashCode);
     } else if (fi.isRepeated) {
       final PbList list = value;
@@ -769,7 +769,7 @@ class FieldSet {
       final MapFieldInfo<dynamic, dynamic> f = fi as dynamic;
       final PbMap<dynamic, dynamic> map =
           f._ensureMapField(meta, this) as dynamic;
-      if (_isGroupOrMessage(f.valueFieldType)) {
+      if (PbFieldTypeInternal.isGroupOrMessage(f.valueFieldType)) {
         final PbMap<dynamic, GeneratedMessage> fieldValueMap = fieldValue;
         for (final entry in fieldValueMap.entries) {
           map[entry.key] = entry.value.deepCopy();
@@ -781,7 +781,7 @@ class FieldSet {
     }
 
     if (fi.isRepeated) {
-      if (_isGroupOrMessage(otherFi.type)) {
+      if (PbFieldTypeInternal.isGroupOrMessage(otherFi.type)) {
         // fieldValue must be a PbList of GeneratedMessage.
         final PbList<GeneratedMessage> pbList = fieldValue;
         final repeatedFields = fi._ensureRepeatedField(meta, this);

@@ -179,7 +179,7 @@ class BuilderInfo {
 
   // Repeated, not a message, group, or enum.
   void p<T>(int tagNumber, String name, int fieldType, {String? protoName}) {
-    assert(!_isGroupOrMessage(fieldType) && !_isEnum(fieldType));
+    assert(!PbFieldTypeInternal.isGroupOrMessage(fieldType) && !PbFieldTypeInternal.isEnum(fieldType));
     addRepeated<T>(tagNumber, name, fieldType, getCheckFunction(fieldType),
         null, null, null,
         protoName: protoName);
@@ -192,7 +192,7 @@ class BuilderInfo {
       List<ProtobufEnum>? enumValues,
       ProtobufEnum? defaultEnumValue,
       String? protoName}) {
-    assert(_isGroupOrMessage(fieldType) || _isEnum(fieldType));
+    assert(PbFieldTypeInternal.isGroupOrMessage(fieldType) || PbFieldTypeInternal.isEnum(fieldType));
     addRepeated<T>(tagNumber, name, fieldType, _checkNotNull, subBuilder,
         valueOf, enumValues,
         defaultEnumValue: defaultEnumValue, protoName: protoName);
