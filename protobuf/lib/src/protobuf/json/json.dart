@@ -2,12 +2,15 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:convert' show base64Decode, base64Encode;
+import 'dart:convert' show base64Decode, base64Encode, jsonDecode, jsonEncode;
 import 'package:fixnum/fixnum.dart' show Int64;
 
 import '../consts.dart';
 import '../internal.dart';
 import '../utils2.dart' as utils2;
+
+String writeToJsonString(FieldSet fs)
+  => jsonEncode(writeToJsonMap(fs));
 
 Map<String, dynamic> writeToJsonMap(FieldSet fs) {
   dynamic convertToMap(dynamic fieldValue, int fieldType) {
@@ -95,6 +98,15 @@ Map<String, dynamic> writeToJsonMap(FieldSet fs) {
     }
   }
   return result;
+}
+
+Object? _emptyReviver(Object? k, Object? v) => v;
+
+/// Merge fields from a [json] string.
+void mergeFromJsonString(
+    FieldSet fs, String json, ExtensionRegistry? registry) {
+  final decoded = jsonDecode(json, reviver: _emptyReviver);
+  mergeFromJsonMap(fs, decoded, registry);
 }
 
 // Merge fields from a previously decoded JSON object.

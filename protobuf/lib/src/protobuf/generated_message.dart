@@ -213,7 +213,7 @@ abstract class GeneratedMessage {
   /// represented as their integer value.
   ///
   /// For the proto3 JSON format use: [toProto3Json].
-  String writeToJson() => jsonEncode(writeToJsonMap());
+  String writeToJson() => json_lib.writeToJsonString(_fieldSet);
 
   /// Returns an Object representing Proto3 JSON serialization of `this`.
   ///
@@ -277,12 +277,8 @@ abstract class GeneratedMessage {
     /// This is a slight regression on the Dart VM.
     /// TODO(skybrian) we could skip the reviver if we're running
     /// on the Dart VM for a slight speedup.
-    final Map<String, dynamic> jsonMap =
-        jsonDecode(data, reviver: _emptyReviver);
-    json_lib.mergeFromJsonMap(_fieldSet, jsonMap, extensionRegistry);
+    json_lib.mergeFromJsonString(_fieldSet, data, extensionRegistry);
   }
-
-  static Object? _emptyReviver(Object? k, Object? v) => v;
 
   /// Merges field values from a JSON object represented as a Dart map.
   ///
