@@ -29,7 +29,7 @@ class FieldSet {
   final List _values;
 
   /// Contains all the extension fields, or null if there aren't any.
-  _ExtensionFieldSet? _extensions;
+  ExtensionFieldSet? _extensions;
 
   /// Contains all the unknown fields, or null if there aren't any.
   UnknownFieldSet? _unknownFields;
@@ -98,8 +98,8 @@ class FieldSet {
   /// The FieldInfo for each non-extension field in tag order.
   Iterable<FieldInfo> get _infosSortedByTag => _meta.sortedByTag;
 
-  _ExtensionFieldSet _ensureExtensions() =>
-      _extensions ??= _ExtensionFieldSet(this);
+  ExtensionFieldSet _ensureExtensions() =>
+      _extensions ??= ExtensionFieldSet(this);
 
   UnknownFieldSet _ensureUnknownFields() {
     if (_unknownFields == null) {
@@ -527,7 +527,7 @@ class FieldSet {
         }
       }
       if (extensions != null) {
-        for (final key in extensions._tagNumbers) {
+        for (final key in extensions.tagNumbers) {
           final fi = extensions._getInfoOrNull(key)!;
           eventPlugin.beforeClearField(fi);
         }
@@ -622,7 +622,7 @@ class FieldSet {
     // Hash with extension fields.
     final extensions = _extensions;
     if (extensions != null) {
-      final sortedByTagNumbers = _sorted(extensions._tagNumbers);
+      final sortedByTagNumbers = utils2.sorted(extensions.tagNumbers);
       for (final tagNumber in sortedByTagNumbers) {
         final fi = extensions._getInfoOrNull(tagNumber)!;
         hash = _hashField(hash, fi, extensions._getFieldOrNull(fi));
@@ -737,7 +737,7 @@ class FieldSet {
 
     final otherExtensions = other._extensions;
     if (otherExtensions != null) {
-      for (final tagNumber in otherExtensions._tagNumbers) {
+      for (final tagNumber in otherExtensions.tagNumbers) {
         final extension = otherExtensions._getInfoOrNull(tagNumber)!;
         final value = otherExtensions._getFieldOrNull(extension);
         _mergeField(extension, value, isExtension: true);
@@ -907,4 +907,20 @@ class FieldSet {
 
     _oneofCases?.addAll(original._oneofCases!);
   }
+}
+
+extension FieldSetInternalExtension on FieldSet {
+  Iterable<FieldInfo> get infos => _infos;
+  Iterable<FieldInfo> get infosSortedByTag => _infosSortedByTag;
+  List get values => _values;
+  ExtensionFieldSet?  get extensions => _extensions;
+  UnknownFieldSet? get unknownFields => _unknownFields;
+  BuilderInfo get meta => _meta;
+  String get messageName => _messageName;
+
+  void ensureWritable() => _ensureWritable();
+  void validateField(FieldInfo fi, dynamic newValue)
+    => _validateField(fi, newValue);
+  void setFieldUnchecked(BuilderInfo meta, FieldInfo fi, dynamic value)
+    => _setFieldUnchecked(meta, fi, value);
 }

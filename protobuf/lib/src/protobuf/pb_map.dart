@@ -4,6 +4,9 @@
 
 part of 'internal.dart';
 
+const mapKeyFieldNumber = 1;
+const mapValueFieldNumber = 2;
+
 /// A [MapBase] implementation used for protobuf `map` fields.
 class PbMap<K, V> extends MapBase<K, V> {
   /// Key type of the map. Per proto2 and proto3 specs, this needs to be an
@@ -17,9 +20,6 @@ class PbMap<K, V> extends MapBase<K, V> {
   ///
   /// The `int` value is interpreted the same way as [FieldInfo.type].
   final int valueFieldType;
-
-  static const int _keyFieldNumber = 1;
-  static const int _valueFieldNumber = 2;
 
   final Map<K, V> _wrappedMap;
 

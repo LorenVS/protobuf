@@ -89,8 +89,8 @@ class CodedBufferWriter {
         _writeTag(fieldNumber, WIRETYPE_LENGTH_DELIMITED);
         final mark = _startLengthDelimited();
         _writeValue(
-            PbMap._keyFieldNumber, map.keyFieldType, key, keyWireFormat);
-        _writeValue(PbMap._valueFieldNumber, map.valueFieldType, value,
+            mapKeyFieldNumber, map.keyFieldType, key, keyWireFormat);
+        _writeValue(mapValueFieldNumber, map.valueFieldType, value,
             valueWireFormat);
         _endLengthDelimited(mark);
       });

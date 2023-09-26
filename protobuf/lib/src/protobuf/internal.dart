@@ -16,9 +16,12 @@ import 'dart:typed_data' show ByteData, Endian, TypedData, Uint8List;
 import 'package:fixnum/fixnum.dart' show Int64;
 import 'package:meta/meta.dart' show UseResult;
 
+import 'consts.dart';
+import 'json/json.dart' as json_lib;
 import 'json_parsing_context.dart';
 import 'permissive_compare.dart';
 import 'type_registry.dart';
+import 'utils2.dart' as utils2;
 
 export 'type_registry.dart' show TypeRegistry;
 
@@ -27,7 +30,6 @@ part 'builder_info.dart';
 part 'coded_buffer.dart';
 part 'coded_buffer_reader.dart';
 part 'coded_buffer_writer.dart';
-part 'consts.dart';
 part 'event_plugin.dart';
 part 'exceptions.dart';
 part 'extension.dart';
@@ -39,7 +41,6 @@ part 'field_set.dart';
 part 'field_type.dart';
 part 'generated_message.dart';
 part 'generated_service.dart';
-part 'json.dart';
 part 'message_set.dart';
 part 'pb_list.dart';
 part 'pb_map.dart';

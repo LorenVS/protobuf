@@ -27,8 +27,6 @@ bool _areMapsEqual(Map lhs, Map rhs) {
   return lhs.keys.every((key) => _deepEquals(lhs[key], rhs[key]));
 }
 
-List<T> _sorted<T>(Iterable<T> list) => List.from(list)..sort();
-
 class _HashUtils {
 // Jenkins hash functions copied from https://github.com/google/quiver-dart/blob/master/lib/src/core/hash.dart.
 

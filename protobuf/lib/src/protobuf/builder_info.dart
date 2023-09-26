@@ -245,8 +245,8 @@ class BuilderInfo {
       dynamic valueDefaultOrMaker}) {
     final mapEntryBuilderInfo = BuilderInfo(entryClassName,
         package: packageName)
-      ..add(PbMap._keyFieldNumber, 'key', keyFieldType, null, null, null, null)
-      ..add(PbMap._valueFieldNumber, 'value', valueFieldType,
+      ..add(mapKeyFieldNumber, 'key', keyFieldType, null, null, null, null)
+      ..add(mapValueFieldNumber, 'value', valueFieldType,
           valueDefaultOrMaker, valueCreator, valueOf, enumValues);
 
     addMapField<K, V>(tagNumber, name, keyFieldType, valueFieldType,
@@ -329,4 +329,14 @@ class BuilderInfo {
     }
     return f!(rawValue);
   }
+}
+
+extension BuilderInfoInternalExtension on BuilderInfo {
+  GeneratedMessage makeEmptyMessage(
+      int tagNumber, ExtensionRegistry? extensionRegistry)
+    => _makeEmptyMessage(tagNumber, extensionRegistry);
+
+  ProtobufEnum? decodeEnum(
+      int tagNumber, ExtensionRegistry? registry, int rawValue)
+      => _decodeEnum(tagNumber, registry, rawValue);
 }

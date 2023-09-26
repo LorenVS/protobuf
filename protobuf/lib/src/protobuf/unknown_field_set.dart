@@ -159,7 +159,7 @@ class UnknownFieldSet {
   String _toString(String indent) {
     final stringBuffer = StringBuffer();
 
-    for (final tag in _sorted(_fields.keys)) {
+    for (final tag in utils2.sorted(_fields.keys)) {
       final field = _fields[tag]!;
       for (final value in field.values) {
         if (value is UnknownFieldSet) {

@@ -198,7 +198,7 @@ abstract class GeneratedMessage {
   /// Returns the JSON encoding of this message as a Dart [Map].
   ///
   /// The encoding is described in [GeneratedMessage.writeToJson].
-  Map<String, dynamic> writeToJsonMap() => _writeToJsonMap(_fieldSet);
+  Map<String, dynamic> writeToJsonMap() => json_lib.writeToJsonMap(_fieldSet);
 
   /// Returns a JSON string that encodes this message.
   ///
@@ -279,7 +279,7 @@ abstract class GeneratedMessage {
     /// on the Dart VM for a slight speedup.
     final Map<String, dynamic> jsonMap =
         jsonDecode(data, reviver: _emptyReviver);
-    _mergeFromJsonMap(_fieldSet, jsonMap, extensionRegistry);
+    json_lib.mergeFromJsonMap(_fieldSet, jsonMap, extensionRegistry);
   }
 
   static Object? _emptyReviver(Object? k, Object? v) => v;
@@ -289,7 +289,7 @@ abstract class GeneratedMessage {
   /// The encoding is described in [GeneratedMessage.writeToJson].
   void mergeFromJsonMap(Map<String, dynamic> json,
       [ExtensionRegistry extensionRegistry = ExtensionRegistry.EMPTY]) {
-    _mergeFromJsonMap(_fieldSet, json, extensionRegistry);
+    json_lib.mergeFromJsonMap(_fieldSet, json, extensionRegistry);
   }
 
   /// Adds an extension field value to a repeated field.
@@ -577,4 +577,8 @@ extension GeneratedMessageGenericExtensions<T extends GeneratedMessage> on T {
 
   /// Returns a writable deep copy of this message.
   T deepCopy() => info_.createEmptyInstance!() as T..mergeFromMessage(this);
+}
+
+extension GeneratedMessageInternalExtension on GeneratedMessage {
+  FieldSet get fieldSet => _fieldSet;
 }

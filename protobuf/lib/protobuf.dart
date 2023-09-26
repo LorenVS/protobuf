@@ -6,5 +6,15 @@
 ///
 /// [1]: https://developers.google.com/protocol-buffers
 
-export 'src/protobuf/internal.dart'
-  hide FieldSet, PbFieldTypeInternal;
+export 'src/protobuf/internal.dart' hide
+  BuilderInfoInternalExtension,
+  ExtensionFieldSet,
+  ExtensionFieldSetInternalExtension,
+  FieldInfoInternalExtension,
+  FieldSet,
+  FieldSetInternalExtension,
+  GeneratedMessageInternalExtension,
+  MapFieldInfoInternalExtension,
+  PbFieldTypeInternal,
+  mapKeyFieldNumber,
+  mapValueFieldNumber;

@@ -240,6 +240,11 @@ class FieldInfo<T> {
   String toString() => name;
 }
 
+extension FieldInfoInternalExtension<T> on FieldInfo<T> {
+  List<T> ensureRepeatedField(BuilderInfo meta, FieldSet fs)
+    => _ensureRepeatedField(meta, fs);
+}
+
 final RegExp _upperCase = RegExp('[A-Z]');
 
 String _unCamelCase(String name) {
@@ -290,7 +295,7 @@ class MapFieldInfo<K, V> extends FieldInfo<PbMap<K, V>?> {
   }
 
   FieldInfo get valueFieldInfo =>
-      mapEntryBuilderInfo.fieldInfo[PbMap._valueFieldNumber]!;
+      mapEntryBuilderInfo.fieldInfo[mapValueFieldNumber]!;
 
   Map<K, V> _ensureMapField(BuilderInfo meta, FieldSet fs) {
     return fs._ensureMapField<K, V>(meta, this);
@@ -300,4 +305,9 @@ class MapFieldInfo<K, V> extends FieldInfo<PbMap<K, V>?> {
     assert(isMapField);
     return m.createMapField<K, V>(tagNumber, this);
   }
+}
+
+extension MapFieldInfoInternalExtension<K, V> on MapFieldInfo<K, V> {
+  Map<K, V> ensureMapField(BuilderInfo meta, FieldSet fs)
+    => _ensureMapField(meta, fs);
 }
