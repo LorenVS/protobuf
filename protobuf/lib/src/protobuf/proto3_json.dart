@@ -4,7 +4,7 @@
 
 part of 'internal.dart';
 
-Object? _writeToProto3Json(_FieldSet fs, TypeRegistry typeRegistry) {
+Object? _writeToProto3Json(FieldSet fs, TypeRegistry typeRegistry) {
   String? convertToMapKey(dynamic key, int keyType) {
     final baseType = PbFieldType._baseType(keyType);
 
@@ -154,7 +154,7 @@ extension _FindFirst<E> on Iterable<E> {
 /// to [fieldSet].
 void _mergeFromProto3Json(
     Object? json,
-    _FieldSet fieldSet,
+    FieldSet fieldSet,
     TypeRegistry typeRegistry,
     bool ignoreUnknownFields,
     bool supportNamesWithUnderscores,
@@ -163,7 +163,7 @@ void _mergeFromProto3Json(
   final context = JsonParsingContext(
       ignoreUnknownFields, supportNamesWithUnderscores, permissiveEnums);
 
-  void recursionHelper(Object? json, _FieldSet fieldSet) {
+  void recursionHelper(Object? json, FieldSet fieldSet) {
     Object? convertProto3JsonValue(Object value, FieldInfo fieldInfo) {
       final fieldType = fieldInfo.type;
       switch (PbFieldType._baseType(fieldType)) {

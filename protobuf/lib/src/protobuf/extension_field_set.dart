@@ -5,7 +5,7 @@
 part of 'internal.dart';
 
 class _ExtensionFieldSet {
-  final _FieldSet _parent;
+  final FieldSet _parent;
   final Map<int, Extension> _info = <int, Extension>{};
   final Map<int, dynamic> _values = <int, dynamic>{};
   bool _isReadOnly = false;

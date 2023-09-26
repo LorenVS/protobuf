@@ -60,7 +60,7 @@ class FieldInfo<T> {
   /// `tagNumber` of `result_per_page` field is 3.
   final int tagNumber;
 
-  /// Index of the field in [_FieldSet._values] list of this field's message.
+  /// Index of the field in [FieldSet._values] list of this field's message.
   ///
   /// The value is `null` for extension fields.
   final int? index;
@@ -231,8 +231,8 @@ class FieldInfo<T> {
   }
 
   /// Convenience method to thread this FieldInfo's reified type parameter to
-  /// _FieldSet._ensureRepeatedField.
-  List<T> _ensureRepeatedField(BuilderInfo meta, _FieldSet fs) {
+  /// [FieldSet]._ensureRepeatedField.
+  List<T> _ensureRepeatedField(BuilderInfo meta, FieldSet fs) {
     return fs._ensureRepeatedField<T>(meta, this);
   }
 
@@ -292,7 +292,7 @@ class MapFieldInfo<K, V> extends FieldInfo<PbMap<K, V>?> {
   FieldInfo get valueFieldInfo =>
       mapEntryBuilderInfo.fieldInfo[PbMap._valueFieldNumber]!;
 
-  Map<K, V> _ensureMapField(BuilderInfo meta, _FieldSet fs) {
+  Map<K, V> _ensureMapField(BuilderInfo meta, FieldSet fs) {
     return fs._ensureMapField<K, V>(meta, this);
   }
 

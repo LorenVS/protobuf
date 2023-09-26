@@ -6,4 +6,5 @@
 ///
 /// [1]: https://developers.google.com/protocol-buffers
 
-export 'src/protobuf/internal.dart';
+export 'src/protobuf/internal.dart'
+  hide FieldSet;

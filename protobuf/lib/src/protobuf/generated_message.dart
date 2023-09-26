@@ -25,13 +25,13 @@ typedef ValueOfFunc = ProtobufEnum? Function(int value);
 /// `GeneratedMessage_reservedNames` and should be unlikely to be used in a
 /// proto file.
 abstract class GeneratedMessage {
-  _FieldSet? __fieldSet;
+  FieldSet? __fieldSet;
 
   @pragma('dart2js:tryInline')
-  _FieldSet get _fieldSet => __fieldSet!;
+  FieldSet get _fieldSet => __fieldSet!;
 
   GeneratedMessage() {
-    __fieldSet = _FieldSet(this, info_, eventPlugin);
+    __fieldSet = FieldSet(this, info_, eventPlugin);
     if (eventPlugin != null) eventPlugin!.attach(this);
   }
 

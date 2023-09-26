@@ -4,7 +4,7 @@
 
 part of 'internal.dart';
 
-void _writeToCodedBufferWriter(_FieldSet fs, CodedBufferWriter out) {
+void _writeToCodedBufferWriter(FieldSet fs, CodedBufferWriter out) {
   // Sorting by tag number isn't required, but it sometimes enables
   // performance optimizations for the receiver. See:
   // https://developers.google.com/protocol-buffers/docs/encoding?hl=en#order
@@ -29,7 +29,7 @@ void _writeToCodedBufferWriter(_FieldSet fs, CodedBufferWriter out) {
   }
 }
 
-void _mergeFromCodedBufferReader(BuilderInfo meta, _FieldSet fs,
+void _mergeFromCodedBufferReader(BuilderInfo meta, FieldSet fs,
     CodedBufferReader input, ExtensionRegistry registry) {
   ArgumentError.checkNotNull(registry);
   fs._ensureWritable();
@@ -199,7 +199,7 @@ void _mergeFromCodedBufferReader(BuilderInfo meta, _FieldSet fs,
   }
 }
 
-void _readPackable(BuilderInfo meta, _FieldSet fs, CodedBufferReader input,
+void _readPackable(BuilderInfo meta, FieldSet fs, CodedBufferReader input,
     int wireType, FieldInfo fi, Function() readFunc) {
   void readToList(List list) => list.add(readFunc());
   _readPackableToList(meta, fs, input, wireType, fi, readToList);
@@ -207,7 +207,7 @@ void _readPackable(BuilderInfo meta, _FieldSet fs, CodedBufferReader input,
 
 void _readPackableToListEnum(
     BuilderInfo meta,
-    _FieldSet fs,
+    FieldSet fs,
     CodedBufferReader input,
     int wireType,
     FieldInfo fi,
@@ -229,7 +229,7 @@ void _readPackableToListEnum(
 
 void _readPackableToList(
     BuilderInfo meta,
-    _FieldSet fs,
+    FieldSet fs,
     CodedBufferReader input,
     int wireType,
     FieldInfo fi,

@@ -4,7 +4,7 @@
 
 part of 'internal.dart';
 
-Map<String, dynamic> _writeToJsonMap(_FieldSet fs) {
+Map<String, dynamic> _writeToJsonMap(FieldSet fs) {
   dynamic convertToMap(dynamic fieldValue, int fieldType) {
     final baseType = PbFieldType._baseType(fieldType);
 
@@ -95,7 +95,7 @@ Map<String, dynamic> _writeToJsonMap(_FieldSet fs) {
 // Merge fields from a previously decoded JSON object.
 // (Called recursively on nested messages.)
 void _mergeFromJsonMap(
-    _FieldSet fs, Map<String, dynamic> json, ExtensionRegistry? registry) {
+    FieldSet fs, Map<String, dynamic> json, ExtensionRegistry? registry) {
   fs._ensureWritable();
   final keys = json.keys;
   final meta = fs._meta;
@@ -117,7 +117,7 @@ void _mergeFromJsonMap(
   }
 }
 
-void _appendJsonList(BuilderInfo meta, _FieldSet fs, List jsonList,
+void _appendJsonList(BuilderInfo meta, FieldSet fs, List jsonList,
     FieldInfo fi, ExtensionRegistry? registry) {
   final repeated = fi._ensureRepeatedField(meta, fs);
   // Micro optimization. Using "for in" generates the following and iterator
@@ -136,13 +136,13 @@ void _appendJsonList(BuilderInfo meta, _FieldSet fs, List jsonList,
   }
 }
 
-void _appendJsonMap(BuilderInfo meta, _FieldSet fs, List jsonList,
+void _appendJsonMap(BuilderInfo meta, FieldSet fs, List jsonList,
     MapFieldInfo fi, ExtensionRegistry? registry) {
   final entryMeta = fi.mapEntryBuilderInfo;
   final map = fi._ensureMapField(meta, fs) as PbMap<dynamic, dynamic>;
   for (final jsonEntryDynamic in jsonList) {
     final jsonEntry = jsonEntryDynamic as Map<String, dynamic>;
-    final entryFieldSet = _FieldSet(null, entryMeta, null);
+    final entryFieldSet = FieldSet(null, entryMeta, null);
     final convertedKey = _convertJsonValue(
         entryMeta,
         entryFieldSet,
@@ -165,7 +165,7 @@ void _appendJsonMap(BuilderInfo meta, _FieldSet fs, List jsonList,
   }
 }
 
-void _setJsonField(BuilderInfo meta, _FieldSet fs, json, FieldInfo fi,
+void _setJsonField(BuilderInfo meta, FieldSet fs, json, FieldInfo fi,
     ExtensionRegistry? registry) {
   final value =
       _convertJsonValue(meta, fs, json, fi.tagNumber, fi.type, registry);
@@ -188,7 +188,7 @@ void _setJsonField(BuilderInfo meta, _FieldSet fs, json, FieldInfo fi,
 /// instead.
 ///
 /// Throws [ArgumentError] if it cannot convert the value.
-dynamic _convertJsonValue(BuilderInfo meta, _FieldSet fs, value, int tagNumber,
+dynamic _convertJsonValue(BuilderInfo meta, FieldSet fs, value, int tagNumber,
     int fieldType, ExtensionRegistry? registry) {
   String expectedType; // for exception message
   switch (PbFieldType._baseType(fieldType)) {
