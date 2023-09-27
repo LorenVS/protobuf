@@ -17,7 +17,10 @@ import 'package:fixnum/fixnum.dart' show Int64;
 import 'package:meta/meta.dart' show UseResult;
 
 import 'consts.dart';
-import 'json/json.dart' as json_lib;
+import 'json/json.dart'
+  if (dart.library.html) 'json/json.html.dart'
+  as json_lib;
+
 import 'json_parsing_context.dart';
 import 'permissive_compare.dart';
 import 'type_registry.dart';
