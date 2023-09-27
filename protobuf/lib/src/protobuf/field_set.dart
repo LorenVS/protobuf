@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of '../../protobuf.dart';
+part of 'internal.dart';
 
 void _throwFrozenMessageModificationError(String messageName,
     [String? methodName]) {
@@ -19,7 +19,7 @@ void _throwFrozenMessageModificationError(String messageName,
 /// These fields and methods are in a separate class to avoid polymorphic
 /// access due to inheritance. This turns out to be faster when compiled to
 /// JavaScript.
-class _FieldSet {
+class FieldSet {
   final GeneratedMessage? _message;
   final EventPlugin? _eventPlugin;
 
@@ -29,7 +29,7 @@ class _FieldSet {
   final List _values;
 
   /// Contains all the extension fields, or null if there aren't any.
-  _ExtensionFieldSet? _extensions;
+  ExtensionFieldSet? _extensions;
 
   /// Contains all the unknown fields, or null if there aren't any.
   UnknownFieldSet? _unknownFields;
@@ -45,7 +45,7 @@ class _FieldSet {
   /// code as an `int`.
   Object _frozenState = false;
 
-  /// The [BuilderInfo] for the [GeneratedMessage] this [_FieldSet] belongs to.
+  /// The [BuilderInfo] for the [GeneratedMessage] this [FieldSet] belongs to.
   ///
   /// WARNING: Avoid calling this for any performance critical code, instead
   /// obtain the [BuilderInfo] on the call site.
@@ -74,7 +74,7 @@ class _FieldSet {
   /// the index is not present, the oneof field is unset.
   final Map<int, int>? _oneofCases;
 
-  _FieldSet(this._message, BuilderInfo meta, this._eventPlugin)
+  FieldSet(this._message, BuilderInfo meta, this._eventPlugin)
       : _values = _makeValueList(meta.byIndex.length),
         _oneofCases = meta.oneofs.isEmpty ? null : <int, int>{};
 
@@ -98,8 +98,8 @@ class _FieldSet {
   /// The FieldInfo for each non-extension field in tag order.
   Iterable<FieldInfo> get _infosSortedByTag => _meta.sortedByTag;
 
-  _ExtensionFieldSet _ensureExtensions() =>
-      _extensions ??= _ExtensionFieldSet(this);
+  ExtensionFieldSet _ensureExtensions() =>
+      _extensions ??= ExtensionFieldSet(this);
 
   UnknownFieldSet _ensureUnknownFields() {
     if (_unknownFields == null) {
@@ -527,7 +527,7 @@ class _FieldSet {
         }
       }
       if (extensions != null) {
-        for (final key in extensions._tagNumbers) {
+        for (final key in extensions.tagNumbers) {
           final fi = extensions._getInfoOrNull(key)!;
           eventPlugin.beforeClearField(fi);
         }
@@ -537,7 +537,7 @@ class _FieldSet {
     extensions?._clearValues();
   }
 
-  bool _equals(_FieldSet o) {
+  bool _equals(FieldSet o) {
     if (_meta != o._meta) return false;
     for (var i = 0; i < _values.length; i++) {
       if (!_equalFieldValues(_values[i], o._values[i])) return false;
@@ -622,7 +622,7 @@ class _FieldSet {
     // Hash with extension fields.
     final extensions = _extensions;
     if (extensions != null) {
-      final sortedByTagNumbers = _sorted(extensions._tagNumbers);
+      final sortedByTagNumbers = utils2.sorted(extensions.tagNumbers);
       for (final tagNumber in sortedByTagNumbers) {
         final fi = extensions._getInfoOrNull(tagNumber)!;
         hash = _hashField(hash, fi, extensions._getFieldOrNull(fi));
@@ -649,11 +649,11 @@ class _FieldSet {
     }
 
     hash = _HashUtils._combine(hash, fi.tagNumber);
-    if (_isBytes(fi.type)) {
+    if (PbFieldTypeInternal.isBytes(fi.type)) {
       // Bytes are represented as a List<int> (Usually with byte-data).
       // We special case that to match our equality semantics.
       hash = _HashUtils._combine(hash, _HashUtils._hashObjects(value));
-    } else if (!_isEnum(fi.type)) {
+    } else if (!PbFieldTypeInternal.isEnum(fi.type)) {
       hash = _HashUtils._combine(hash, value.hashCode);
     } else if (fi.isRepeated) {
       final PbList list = value;
@@ -724,7 +724,7 @@ class _FieldSet {
   /// Singular fields that are set in [other] overwrite the corresponding fields
   /// in this message. Repeated fields are appended. Singular sub-messages are
   /// recursively merged.
-  void _mergeFromMessage(_FieldSet other) {
+  void _mergeFromMessage(FieldSet other) {
     // TODO(https://github.com/google/protobuf.dart/issues/60): Recognize
     // when `this` and [other] are the same protobuf (e.g. from cloning). In
     // this case, we can merge the non-extension fields without field lookups or
@@ -737,7 +737,7 @@ class _FieldSet {
 
     final otherExtensions = other._extensions;
     if (otherExtensions != null) {
-      for (final tagNumber in otherExtensions._tagNumbers) {
+      for (final tagNumber in otherExtensions.tagNumbers) {
         final extension = otherExtensions._getInfoOrNull(tagNumber)!;
         final value = otherExtensions._getFieldOrNull(extension);
         _mergeField(extension, value, isExtension: true);
@@ -769,7 +769,7 @@ class _FieldSet {
       final MapFieldInfo<dynamic, dynamic> f = fi as dynamic;
       final PbMap<dynamic, dynamic> map =
           f._ensureMapField(meta, this) as dynamic;
-      if (_isGroupOrMessage(f.valueFieldType)) {
+      if (PbFieldTypeInternal.isGroupOrMessage(f.valueFieldType)) {
         final PbMap<dynamic, GeneratedMessage> fieldValueMap = fieldValue;
         for (final entry in fieldValueMap.entries) {
           map[entry.key] = entry.value.deepCopy();
@@ -781,7 +781,7 @@ class _FieldSet {
     }
 
     if (fi.isRepeated) {
-      if (_isGroupOrMessage(otherFi.type)) {
+      if (PbFieldTypeInternal.isGroupOrMessage(otherFi.type)) {
         // fieldValue must be a PbList of GeneratedMessage.
         final PbList<GeneratedMessage> pbList = fieldValue;
         final repeatedFields = fi._ensureRepeatedField(meta, this);
@@ -874,7 +874,7 @@ class _FieldSet {
   /// Makes a shallow copy of all values from [original] to this.
   ///
   /// Map fields and repeated fields are copied.
-  void _shallowCopyValues(_FieldSet original) {
+  void _shallowCopyValues(FieldSet original) {
     _values.setRange(0, original._values.length, original._values);
     final info = _meta;
     for (var index = 0; index < info.byIndex.length; index++) {
@@ -907,4 +907,20 @@ class _FieldSet {
 
     _oneofCases?.addAll(original._oneofCases!);
   }
+}
+
+extension FieldSetInternalExtension on FieldSet {
+  Iterable<FieldInfo> get infos => _infos;
+  Iterable<FieldInfo> get infosSortedByTag => _infosSortedByTag;
+  List get values => _values;
+  ExtensionFieldSet?  get extensions => _extensions;
+  UnknownFieldSet? get unknownFields => _unknownFields;
+  BuilderInfo get meta => _meta;
+  String get messageName => _messageName;
+
+  void ensureWritable() => _ensureWritable();
+  void validateField(FieldInfo fi, dynamic newValue)
+    => _validateField(fi, newValue);
+  void setFieldUnchecked(BuilderInfo meta, FieldInfo fi, dynamic value)
+    => _setFieldUnchecked(meta, fi, value);
 }

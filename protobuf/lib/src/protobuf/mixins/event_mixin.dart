@@ -5,7 +5,7 @@
 import 'dart:async' show StreamController, scheduleMicrotask;
 import 'dart:collection' show UnmodifiableListView;
 
-import '../../../protobuf.dart' show EventPlugin, FieldInfo, GeneratedMessage;
+import '../internal.dart' show EventPlugin, FieldInfo, GeneratedMessage;
 
 /// Provides a stream of changes to fields in a [GeneratedMessage].
 /// (Experimental.)

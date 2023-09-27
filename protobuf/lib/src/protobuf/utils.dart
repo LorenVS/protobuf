@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of '../../protobuf.dart';
+part of 'internal.dart';
 
 // TODO(antonm): reconsider later if PbList should take care of equality.
 bool _deepEquals(lhs, rhs) {
@@ -26,8 +26,6 @@ bool _areMapsEqual(Map lhs, Map rhs) {
   if (lhs.length != rhs.length) return false;
   return lhs.keys.every((key) => _deepEquals(lhs[key], rhs[key]));
 }
-
-List<T> _sorted<T>(Iterable<T> list) => List.from(list)..sort();
 
 class _HashUtils {
 // Jenkins hash functions copied from https://github.com/google/quiver-dart/blob/master/lib/src/core/hash.dart.

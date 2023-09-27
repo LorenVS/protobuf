@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of '../../protobuf.dart';
+part of 'internal.dart';
 
 /// A collection of [Extension] objects, organized by the message type they
 /// extend.
@@ -175,7 +175,7 @@ T _reparseMessage<T extends GeneratedMessage>(
       final messageMapDynamic = message._fieldSet._values[field.index!];
       if (messageMapDynamic == null) continue;
       final PbMap messageMap = messageMapDynamic;
-      if (_isGroupOrMessage(field.valueFieldType)) {
+      if (PbFieldTypeInternal.isGroupOrMessage(field.valueFieldType)) {
         for (final key in messageMap.keys) {
           final GeneratedMessage value = messageMap[key];
           final reparsedValue = _reparseMessage(value, extensionRegistry);

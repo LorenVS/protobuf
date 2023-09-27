@@ -2,7 +2,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-part of '../../protobuf.dart';
+part of 'internal.dart';
 
 /// An object representing a protobuf message field.
 class FieldInfo<T> {
@@ -60,7 +60,7 @@ class FieldInfo<T> {
   /// `tagNumber` of `result_per_page` field is 3.
   final int tagNumber;
 
-  /// Index of the field in [_FieldSet._values] list of this field's message.
+  /// Index of the field in [FieldSet._values] list of this field's message.
   ///
   /// The value is `null` for extension fields.
   final int? index;
@@ -109,10 +109,10 @@ class FieldInfo<T> {
         check = null,
         _protoName = protoName,
         assert(type != 0),
-        assert(!_isGroupOrMessage(type) ||
+        assert(!PbFieldTypeInternal.isGroupOrMessage(type) ||
             subBuilder != null ||
-            _isMapField(type)),
-        assert(!_isEnum(type) || valueOf != null);
+            PbFieldTypeInternal.isMapField(type)),
+        assert(!PbFieldTypeInternal.isEnum(type) || valueOf != null);
 
   // Represents a field that has been removed by a program transformation.
   FieldInfo.dummy(this.index)
@@ -134,13 +134,13 @@ class FieldInfo<T> {
         _protoName = protoName {
     ArgumentError.checkNotNull(name, 'name');
     ArgumentError.checkNotNull(tagNumber, 'tagNumber');
-    assert(_isRepeated(type));
+    assert(PbFieldTypeInternal.isRepeated(type));
     assert(check != null);
-    assert(!_isEnum(type) || valueOf != null);
+    assert(!PbFieldTypeInternal.isEnum(type) || valueOf != null);
   }
 
   static MakeDefaultFunc? findMakeDefault(int type, dynamic defaultOrMaker) {
-    if (defaultOrMaker == null) return PbFieldType._defaultForType(type);
+    if (defaultOrMaker == null) return PbFieldTypeInternal.defaultForType(type);
     if (defaultOrMaker is MakeDefaultFunc) return defaultOrMaker;
     return () => defaultOrMaker;
   }
@@ -149,11 +149,11 @@ class FieldInfo<T> {
   /// been removed by a program transformation.
   bool get _isDummy => tagNumber == 0;
 
-  bool get isRequired => _isRequired(type);
-  bool get isRepeated => _isRepeated(type);
-  bool get isGroupOrMessage => _isGroupOrMessage(type);
-  bool get isEnum => _isEnum(type);
-  bool get isMapField => _isMapField(type);
+  bool get isRequired => PbFieldTypeInternal.isRequired(type);
+  bool get isRepeated => PbFieldTypeInternal.isRepeated(type);
+  bool get isGroupOrMessage => PbFieldTypeInternal.isGroupOrMessage(type);
+  bool get isEnum => PbFieldTypeInternal.isEnum(type);
+  bool get isMapField => PbFieldTypeInternal.isMapField(type);
 
   /// Returns a read-only default value for a field. Unlike
   /// [GeneratedMessage.getField], doesn't create a repeated field.
@@ -168,7 +168,7 @@ class FieldInfo<T> {
   /// That is, it doesn't contain any required fields that aren't initialized.
   bool _hasRequiredValues(value) {
     if (value == null) return !isRequired; // missing is okay if optional
-    if (!_isGroupOrMessage(type)) return true; // primitive and present
+    if (!PbFieldTypeInternal.isGroupOrMessage(type)) return true; // primitive and present
 
     if (!isRepeated) {
       // A required message: recurse.
@@ -191,7 +191,7 @@ class FieldInfo<T> {
   void _appendInvalidFields(List<String> problems, value, String prefix) {
     if (value == null) {
       if (isRequired) problems.add('$prefix$name');
-    } else if (!_isGroupOrMessage(type)) {
+    } else if (!PbFieldTypeInternal.isGroupOrMessage(type)) {
       // primitive and present
     } else if (!isRepeated) {
       // Required message/group: recurse.
@@ -231,13 +231,18 @@ class FieldInfo<T> {
   }
 
   /// Convenience method to thread this FieldInfo's reified type parameter to
-  /// _FieldSet._ensureRepeatedField.
-  List<T> _ensureRepeatedField(BuilderInfo meta, _FieldSet fs) {
+  /// [FieldSet]._ensureRepeatedField.
+  List<T> _ensureRepeatedField(BuilderInfo meta, FieldSet fs) {
     return fs._ensureRepeatedField<T>(meta, this);
   }
 
   @override
   String toString() => name;
+}
+
+extension FieldInfoInternalExtension<T> on FieldInfo<T> {
+  List<T> ensureRepeatedField(BuilderInfo meta, FieldSet fs)
+    => _ensureRepeatedField(meta, fs);
 }
 
 final RegExp _upperCase = RegExp('[A-Z]');
@@ -285,14 +290,14 @@ class MapFieldInfo<K, V> extends FieldInfo<PbMap<K, V>?> {
             protoName: protoName) {
     ArgumentError.checkNotNull(name, 'name');
     ArgumentError.checkNotNull(tagNumber, 'tagNumber');
-    assert(_isMapField(type));
-    assert(!_isEnum(type) || valueOf != null);
+    assert(PbFieldTypeInternal.isMapField(type));
+    assert(!PbFieldTypeInternal.isEnum(type) || valueOf != null);
   }
 
   FieldInfo get valueFieldInfo =>
-      mapEntryBuilderInfo.fieldInfo[PbMap._valueFieldNumber]!;
+      mapEntryBuilderInfo.fieldInfo[mapValueFieldNumber]!;
 
-  Map<K, V> _ensureMapField(BuilderInfo meta, _FieldSet fs) {
+  Map<K, V> _ensureMapField(BuilderInfo meta, FieldSet fs) {
     return fs._ensureMapField<K, V>(meta, this);
   }
 
@@ -300,4 +305,9 @@ class MapFieldInfo<K, V> extends FieldInfo<PbMap<K, V>?> {
     assert(isMapField);
     return m.createMapField<K, V>(tagNumber, this);
   }
+}
+
+extension MapFieldInfoInternalExtension<K, V> on MapFieldInfo<K, V> {
+  Map<K, V> ensureMapField(BuilderInfo meta, FieldSet fs)
+    => _ensureMapField(meta, fs);
 }

@@ -12,6 +12,7 @@ dependencies:
   collection: ^1.15.0
   fixnum: ^1.0.0
   meta: ^1.7.0
+  js: ^0.6.0
 
 dev_dependencies:
   dart_flutter_team_lints: ^1.0.0
