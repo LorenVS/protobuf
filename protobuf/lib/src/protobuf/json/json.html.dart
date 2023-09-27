@@ -21,8 +21,110 @@ external Object jsonParse(String json);
 @js.JS('Object.keys')
 external List<String> objectKeys(Object value);
 
-String writeToJsonString(FieldSet fs)
-  => jsonEncode(writeToJsonMap(fs));
+@js.JS('Array')
+external Object newJsArray();
+
+String writeToJsonString(FieldSet fs) {
+  final rawJs = _writeToRawJs(fs);
+  return jsonStringify(rawJs);
+}
+
+Object _writeToRawJs(FieldSet fs) {
+  dynamic convertToRawJs(dynamic fieldValue, int fieldType) {
+    final baseType = PbFieldTypeInternal.baseType(fieldType);
+
+    if (PbFieldTypeInternal.isRepeated(fieldType)) {
+      final PbList list = fieldValue;
+      final jsArray = newJsArray();
+      final length = list.length;
+      for (var i = 0; i < length; i++) {
+        final entry = list[i];
+        js_util.callMethod(jsArray, 'push', [convertToRawJs(entry, baseType)]);
+      }
+      return jsArray;
+    }
+
+    switch (baseType) {
+      case PbFieldTypeInternal.BOOL_BIT:
+      case PbFieldTypeInternal.STRING_BIT:
+      case PbFieldTypeInternal.INT32_BIT:
+      case PbFieldTypeInternal.SINT32_BIT:
+      case PbFieldTypeInternal.UINT32_BIT:
+      case PbFieldTypeInternal.FIXED32_BIT:
+      case PbFieldTypeInternal.SFIXED32_BIT:
+        return fieldValue;
+      case PbFieldTypeInternal.FLOAT_BIT:
+      case PbFieldTypeInternal.DOUBLE_BIT:
+        final value = fieldValue as double;
+        if (value.isNaN) {
+          return nan;
+        }
+        if (value.isInfinite) {
+          return value.isNegative ? negativeInfinity : infinity;
+        }
+        if (fieldValue.toInt() == fieldValue) {
+          return fieldValue.toInt();
+        }
+        return value;
+      case PbFieldTypeInternal.BYTES_BIT:
+        // Encode 'bytes' as a base64-encoded string.
+        return base64Encode(fieldValue as List<int>);
+      case PbFieldTypeInternal.ENUM_BIT:
+        final ProtobufEnum enum_ = fieldValue;
+        return enum_.value; // assume |value| < 2^52
+      case PbFieldTypeInternal.INT64_BIT:
+      case PbFieldTypeInternal.SINT64_BIT:
+      case PbFieldTypeInternal.SFIXED64_BIT:
+        return fieldValue.toString();
+      case PbFieldTypeInternal.UINT64_BIT:
+      case PbFieldTypeInternal.FIXED64_BIT:
+        final Int64 int_ = fieldValue;
+        return int_.toStringUnsigned();
+      case PbFieldTypeInternal.GROUP_BIT:
+      case PbFieldTypeInternal.MESSAGE_BIT:
+        final GeneratedMessage msg = fieldValue;
+        return _writeToRawJs(msg.fieldSet);
+      default:
+        throw UnsupportedError('Unknown type $fieldType');
+    }
+  }
+
+  Object writeMap(PbMap fieldValue, MapFieldInfo fi) {
+    final jsArray = newJsArray();
+    for (final entry in fieldValue.entries) {
+      final entryJsObj = js_util.newObject();
+      js_util.setProperty(entryJsObj, mapKeyFieldNumber, convertToRawJs(entry.key, fi.keyFieldType));
+      js_util.setProperty(entryJsObj, mapValueFieldNumber, convertToRawJs(entry.value, fi.valueFieldType));
+      js_util.callMethod(jsArray, 'push', [entryJsObj]);
+    }
+    return jsArray;
+  }
+
+  final result = js_util.newObject();
+  for (final fi in fs.infosSortedByTag) {
+    final value = fs.values[fi.index!];
+    if (value == null || (value is List && value.isEmpty)) {
+      continue; // It's missing, repeated, or an empty byte array.
+    }
+    if (PbFieldTypeInternal.isMapField(fi.type)) {
+      js_util.setProperty(result, fi.tagNumber, writeMap(value, fi as MapFieldInfo<dynamic, dynamic>));
+      continue;
+    }
+    js_util.setProperty(result, fi.tagNumber, convertToRawJs(value, fi.type));
+  }
+  final extensions = fs.extensions;
+  if (extensions != null) {
+    for (final tagNumber in utils2.sorted(extensions.tagNumbers)) {
+      final value = extensions.values[tagNumber];
+      if (value is List && value.isEmpty) {
+        continue; // It's repeated or an empty byte array.
+      }
+      final fi = extensions.getInfoOrNull(tagNumber)!;
+      js_util.setProperty(result, tagNumber, convertToRawJs(value, fi.type));
+    }
+  }
+  return result;
+}
 
 Map<String, dynamic> writeToJsonMap(FieldSet fs) {
   dynamic convertToMap(dynamic fieldValue, int fieldType) {
