@@ -110,6 +110,22 @@ class BuilderInfo {
         protoName: protoName));
   }
 
+  void addRepeatedMessage<T extends GeneratedMessage>(
+      int tagNumber,
+      String name,
+      int fieldType,
+      CheckFunc<T> check,
+      CreateBuilderFunc? subBuilder,
+      ValueOfFunc? valueOf,
+      {String? protoName}) {
+    final index = byIndex.length;
+    _addField(RepeatedMessageFieldInfo<T>(
+        name, tagNumber, index, fieldType, check, subBuilder,
+        valueOf: valueOf,
+        protoName: protoName));
+  }
+
+
   void _addField(FieldInfo fi) {
     byIndex.add(fi);
     assert(byIndex[fi.index!] == fi);
@@ -197,6 +213,17 @@ class BuilderInfo {
         valueOf, enumValues,
         defaultEnumValue: defaultEnumValue, protoName: protoName);
   }
+
+  // Repeated message or group.
+  void pcm<T extends GeneratedMessage>(int tagNumber, String name, int fieldType,
+      {CreateBuilderFunc? subBuilder,
+      ValueOfFunc? valueOf,
+      String? protoName}) {
+    assert(_isGroupOrMessage(fieldType));
+    addRepeatedMessage<T>(tagNumber, name, fieldType, _checkNotNull, subBuilder,
+        valueOf, protoName: protoName);
+  }
+
 
   void aOM<T extends GeneratedMessage>(int tagNumber, String name,
       {required T Function() subBuilder, String? protoName}) {

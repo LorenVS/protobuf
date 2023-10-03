@@ -416,8 +416,8 @@ class MessageGenerator extends ProtobufContainer {
       out.println('$classname createEmptyInstance() => create();');
 
       out.println(
-          'static $protobufImportPrefix.PbList<$classname> createRepeated() =>'
-          ' $protobufImportPrefix.PbList<$classname>();');
+          'static $protobufImportPrefix.PbListMessage<$classname> createRepeated() =>'
+          ' $protobufImportPrefix.PbListMessage<$classname>();');
       out.println("@$coreImportPrefix.pragma('dart2js:noInline')");
       out.println('static $classname getDefault() =>'
           ' _defaultInstance ??='

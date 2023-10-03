@@ -104,9 +104,9 @@ class FieldInfo<T> {
       this.valueOf,
       this.enumValues,
       this.defaultEnumValue,
+      this.check = null,
       String? protoName})
       : makeDefault = findMakeDefault(type, defaultOrMaker),
-        check = null,
         _protoName = protoName,
         assert(type != 0),
         assert(!_isGroupOrMessage(type) ||
@@ -138,6 +138,16 @@ class FieldInfo<T> {
     assert(check != null);
     assert(!_isEnum(type) || valueOf != null);
   }
+
+  FieldInfo.repeatedMessage(this.name, this.tagNumber, this.index, this.type,
+    this.check, this.subBuilder, {
+      String? protoName,
+      this.makeDefault,
+    })
+    : _protoName = protoName,
+    valueOf = null,
+    enumValues = null,
+    defaultEnumValue = null;
 
   static MakeDefaultFunc? findMakeDefault(int type, dynamic defaultOrMaker) {
     if (defaultOrMaker == null) return PbFieldType._defaultForType(type);
@@ -245,6 +255,28 @@ final RegExp _upperCase = RegExp('[A-Z]');
 String _unCamelCase(String name) {
   return name.replaceAllMapped(
       _upperCase, (match) => '_${match.group(0)!.toLowerCase()}');
+}
+
+class RepeatedMessageFieldInfo<E extends GeneratedMessage> extends FieldInfo<E> {
+  RepeatedMessageFieldInfo(
+      String name,
+      int tagNumber,
+      int index,
+      int type,
+      CheckFunc<E>? check,
+      CreateBuilderFunc? subBuilder,
+      {
+        ValueOfFunc? valueOf,
+        String? protoName,
+      }) : super.repeatedMessage(name, tagNumber, index, type, check, subBuilder,
+        protoName: protoName,
+        makeDefault: (() => PbListMessage<E>(check: check!)),);
+
+  @override
+  List<E> _createRepeatedField(GeneratedMessage m) {
+    assert(isRepeated);
+    return PbListMessage<E>(check: check!);
+  }
 }
 
 /// A [FieldInfo] subclass for protobuf `map` fields.

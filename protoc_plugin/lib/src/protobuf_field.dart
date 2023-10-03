@@ -234,7 +234,9 @@ class ProtobufField {
         invocation = 'pPS';
       } else {
         args.add(typeConstant);
-        if (baseType.isMessage || baseType.isGroup || baseType.isEnum) {
+        if (baseType.isMessage || baseType.isGroup) {
+          invocation = 'pcm<$type>';
+        } else if (baseType.isEnum) {
           invocation = 'pc<$type>';
         } else {
           invocation = 'p<$type>';

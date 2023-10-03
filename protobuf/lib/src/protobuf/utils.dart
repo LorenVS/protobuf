@@ -45,7 +45,7 @@ class _HashUtils {
   }
 
   /// Generates a hash code for multiple [objects].
-  static int _hashObjects(Iterable objects) =>
+  static int _hashObjects<T>(Iterable<T> objects) =>
       _finish(objects.fold(0, (h, i) => _combine(h, i.hashCode)));
 
   /// Generates a hash code for two objects.
